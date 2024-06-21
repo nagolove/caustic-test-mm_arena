@@ -1,9 +1,7 @@
 // vim: set colorcolumn=85
 // vim: fdm=marker
 
-#include "koh_rand.h"
 #include "koh_mm.h"
-#include "uthash.h"
 #include "munit.h"
 #include "stdbool.h"
 #include "stdbool.h"
@@ -13,19 +11,48 @@
 #include <stdlib.h>
 #include <string.h>
 
-static bool verbose = true;
+static bool verbose = false;
 
-static MunitResult test_new_add_exist_free(
+struct Block {
+    char payload[3];
+} __attribute__((packed));
+
+_Static_assert(
+    sizeof(struct Block) == 3,
+    "struct Block should be packed"
+);
+
+static MunitResult test_mm_init_shutdown(
     const MunitParameter params[], void* data
 ) {
+    MMArena mm;
+
+    {
+        mm_arena_init(&mm, (struct MMArenaOpts) {
+                .initial_capacity = 100,
+                .block_sz = sizeof(struct Block),
+                .threshold1 = 300,
+                .mult1 = 1.5,
+                .threshold2 = 1300,
+                .mult2 = 1.6,
+                .threshold3 = 3000,
+                .mult3 = 2,
+                });
+        mm_arena_shutdown(&mm);
+    }
+
+    {
+        mm_arena_init(&mm, mm_arena_opts_default);
+        mm_arena_shutdown(&mm);
+    }
 
     return MUNIT_OK;
 }
 
 static MunitTest test_suite_tests[] = {
   {
-    (char*) "/new_add_exist_free",
-    test_new_add_exist_free,
+    (char*) "/mm_init_shutdown",
+    test_mm_init_shutdown,
     NULL,
     NULL,
     MUNIT_TEST_OPTION_NONE,
