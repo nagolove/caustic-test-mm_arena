@@ -29,16 +29,16 @@ static MunitResult test_mm_init_shutdown(
 
     {
         mm_arena_init(&mm, (struct MMArenaOpts) {
-                .initial_capacity = 100,
-                .block_sz = sizeof(struct Block),
-                .threshold1 = 300,
-                .mult1 = 1.5,
-                .threshold2 = 1300,
-                .mult2 = 1.6,
-                .threshold3 = 3000,
-                .mult3 = 2,
-                });
-        mm_arena_shutdown(&mm);
+            .initial_capacity = 100,
+            .block_sz = sizeof(struct Block),
+            .threshold1 = 300,
+            .mult1 = 1.5,
+            .threshold2 = 1300,
+            .mult2 = 1.6,
+            .threshold3 = 3000,
+            .mult3 = 2,
+            });
+    mm_arena_shutdown(&mm);
     }
 
     {
