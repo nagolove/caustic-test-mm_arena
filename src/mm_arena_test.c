@@ -13,9 +13,9 @@
 
 static bool verbose = false;
 
-struct Block {
+typedef struct Block {
     char payload[3];
-} __attribute__((packed));
+} __attribute__((packed)) Block;
 
 _Static_assert(
     sizeof(struct Block) == 3,
@@ -27,22 +27,26 @@ static MunitResult test_mm_init_shutdown(
 ) {
     MMArena mm;
 
+    _Static_assert(sizeof(Block) == 3, "Block has not proper size");
+
     {
         mm_arena_init(&mm, (struct MMArenaOpts) {
-            .initial_capacity = 100,
+            .capacity1 = 100,
             .block_sz = sizeof(struct Block),
-            .threshold1 = 300,
-            .mult1 = 1.5,
-            .threshold2 = 1300,
-            .mult2 = 1.6,
-            .threshold3 = 3000,
-            .mult3 = 2,
-            });
-    mm_arena_shutdown(&mm);
+            .capacity2 = 300,
+            .mult2 = 1.5,
+            .capacity3 = 1300,
+            .mult3 = 1.6,
+            .capacity4 = 3000,
+            .mult4 = 2,
+        });
+        mm_arena_shutdown(&mm);
     }
 
     {
-        mm_arena_init(&mm, mm_arena_opts_default);
+        MMArenaOpts opts = mm_arena_opts_default;
+        opts.block_sz = 1;
+        mm_arena_init(&mm, opts);
         mm_arena_shutdown(&mm);
     }
 
